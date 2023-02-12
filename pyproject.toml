@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "pdf-parser"
+version = "0.1.0"
+description = ""
+authors = ["Ezequiel Barbero <barbero.oe@gmail.com>"]
+readme = "README.md"
+packages = [{include = "pdf_parser"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pdfplumber = "^0.7.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
