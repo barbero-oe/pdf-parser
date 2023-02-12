@@ -1,8 +1,3 @@
-*
-!pdf_parser/
-!tests/
-!.gitignore
-!poetry.lock
-!pyproject.toml
-!README.md
-!.pre-commit-config.yaml
+.idea/
+.pytest_cache/
+.DS_Store
