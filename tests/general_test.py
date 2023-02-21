@@ -1,6 +1,6 @@
 import pytest
 
-from pdf_parser.commands import PageGroup
+from pdf_parser.commands import PageGroup, InvalidGroupDefinition
 
 
 @pytest.mark.parametrize(
@@ -19,3 +19,8 @@ from pdf_parser.commands import PageGroup
 def test_page_grouping(definition, check, expected):
     group = PageGroup(definition)
     assert (check in group) == expected
+
+
+@pytest.mark.parametrize("definition", ["1,", ",,", "-", ",-,", "1,2-5-8"])
+def test_correct_grouping_formatting(definition):
+    pytest.raises(InvalidGroupDefinition, lambda: PageGroup(definition))
