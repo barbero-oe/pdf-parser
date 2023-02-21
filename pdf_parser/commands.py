@@ -1,11 +1,10 @@
 import dataclasses
 from pathlib import Path
-from typing import List, Callable, Any, Tuple
+from typing import List, Callable, Any, Tuple, Dict
 
 import pdfplumber
 from pdfplumber.page import Page
 import yaml
-from cfgv import Map
 
 
 class InvalidGroupDefinition(Exception):
@@ -52,7 +51,7 @@ class UnknownAction(Exception):
     pass
 
 
-def parse_command(definition: Map[str, Any]) -> Command:
+def parse_command(definition: Dict[str, Any]) -> Command:
     name = definition["type"]
     if name == "crop":
         coords: Box = tuple(definition["box"])
