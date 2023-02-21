@@ -1,6 +1,6 @@
 import dataclasses
 from pathlib import Path
-from typing import List, Callable, Any, Tuple, Dict
+from typing import List, Callable, Any, Tuple, Dict, cast
 
 import pdfplumber
 from pdfplumber.page import Page
@@ -54,7 +54,7 @@ class UnknownAction(Exception):
 def parse_command(definition: Dict[str, Any]) -> Command:
     name = definition["type"]
     if name == "crop":
-        coords: Box = tuple(definition["box"])
+        coords: Box = cast(Box, definition["box"])
         return Command(name, lambda page: crop(page, coords))
     else:
         raise UnknownAction(name)
@@ -74,8 +74,8 @@ def parse(request: str) -> Request:
     return Request(pages=pages, commands=commands)
 
 
-def dispatch(command: str, input: Path, output: Path):
-    req: Request = parse(command)
+def dispatch(request: str, input: Path, output: Path):
+    req: Request = parse(request)
     pdf: pdfplumber.PDF
     with pdfplumber.open(input) as pdf:
         for index in req.pages:
