@@ -24,3 +24,8 @@ def test_page_grouping(definition, check, expected):
 @pytest.mark.parametrize("definition", ["1,", ",,", "-", ",-,", "1,2-5-8"])
 def test_correct_grouping_formatting(definition):
     pytest.raises(InvalidGroupDefinition, lambda: PageGroup(definition))
+
+
+def test_iterates_over_pages():
+    pages = [page for page in PageGroup("1,2,5-8,10")]
+    assert pages == [1, 2, 5, 6, 7, 8, 10]

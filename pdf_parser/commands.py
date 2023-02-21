@@ -1,7 +1,11 @@
+import dataclasses
 from pathlib import Path
-from typing import List
+from typing import List, Callable, Any, Tuple
 
 import pdfplumber
+from pdfplumber.page import Page
+import yaml
+from cfgv import Map
 
 
 class InvalidGroupDefinition(Exception):
@@ -25,11 +29,59 @@ class PageGroup:
     def __contains__(self, item):
         return item in self.pages
 
+    def __iter__(self):
+        return iter(self.pages)
+
+
+@dataclasses.dataclass
+class Command:
+    name: str
+    fun: Callable[[Page], Page]
+
+    def __call__(self, page: Page) -> Page:
+        return self.fun(page)
+
+
+@dataclasses.dataclass
+class Request:
+    pages: PageGroup
+    commands: List[Command]
+
+
+class UnknownAction(Exception):
+    pass
+
+
+def parse_command(definition: Map[str, Any]) -> Command:
+    name = definition["type"]
+    if name == "crop":
+        coords: Box = tuple(definition["box"])
+        return Command(name, lambda page: crop(page, coords))
+    else:
+        raise UnknownAction(name)
+
+
+Box = Tuple[int | float, int | float, int | float, int | float]
+
+
+def crop(page: Page, box: Box) -> Page:
+    return page.crop(box)
+
+
+def parse(request: str) -> Request:
+    req = yaml.safe_load(request)
+    pages = PageGroup(req["pages"])
+    commands = [parse_command(command) for command in req["commands"]]
+    return Request(pages=pages, commands=commands)
+
 
 def dispatch(command: str, input: Path, output: Path):
-    # comm = yaml.safe_load(command)
+    req: Request = parse(command)
     pdf: pdfplumber.PDF
     with pdfplumber.open(input) as pdf:
-        page = pdf.pages[0].crop((0, 0, 595, 842))
-        img = page.to_image()
-        img.save(output, format="jpeg")
+        for index in req.pages:
+            page = pdf.pages[index - 1]
+            for command in req.commands:
+                page = command(page)
+            img = page.to_image()
+            img.save(output / "1.jpeg", format="jpeg")
