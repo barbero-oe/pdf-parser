@@ -564,7 +564,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -667,4 +667,4 @@ test = ["pytest (>=7.2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "255b7a43becfecbe754cfb4b4565319b247c40976d0443a68e8bd1ccc7eee8ff"
+content-hash = "03c5f245c81121b4c97bd33d78d7a32063e873806225b27a44f5c69879544b65"
