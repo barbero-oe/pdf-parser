@@ -1,10 +1,12 @@
 import dataclasses
+import itertools
 from pathlib import Path
-from typing import List, Callable, Any, Tuple, Dict, cast
+from typing import List, Callable, Any, Dict
 
 import pdfplumber
-from pdfplumber.page import Page
 import yaml
+from pdfplumber.display import PageImage
+from pdfplumber.page import Page
 
 
 class InvalidGroupDefinition(Exception):
@@ -54,17 +56,45 @@ class UnknownAction(Exception):
 def parse_command(definition: Dict[str, Any]) -> Command:
     name = definition["type"]
     if name == "crop":
-        coords: Box = cast(Box, definition["box"])
-        return Command(name, lambda page: crop(page, coords))
+        box = Box(*definition["box"])
+        return Command(name, lambda page: crop(page, box))
     else:
         raise UnknownAction(name)
 
 
-Box = Tuple[int | float, int | float, int | float, int | float]
+@dataclasses.dataclass
+class Coord:
+    x: int | float
+    y: int | float
+
+    def __iter__(self):
+        return iter([self.x, self.y])
+
+
+class Box:
+    def __init__(
+        self, x0: int | float, y0: int | float, x1: int | float, y1: int | float
+    ):
+        self.bottomLeft = Coord(x0, y0)
+        self.topRight = Coord(x1, y1)
+
+    def __iter__(self):
+        return itertools.chain(self.bottomLeft, self.topRight)
+
+
+def preview_crop(page: PageImage, box: Box) -> Page:
+    page.draw_rects(
+        [
+            (0, 0, box.bottomLeft.x, page.original.height),
+            (0, 0, box.bottomLeft.x, page.original.height),
+            (0, 0, box.bottomLeft.x, page.original.height),
+            (0, 0, box.bottomLeft.x, page.original.height),
+        ]
+    )
 
 
 def crop(page: Page, box: Box) -> Page:
-    return page.crop(box)
+    return page.crop(tuple(box))
 
 
 def parse(request: str) -> Request:
