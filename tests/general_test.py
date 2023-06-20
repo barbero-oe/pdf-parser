@@ -26,6 +26,13 @@ def test_correct_grouping_formatting(definition):
     pytest.raises(InvalidGroupDefinition, lambda: PageGroup(definition))
 
 
+def test_contains_pages():
+    test_group = [x in {1, 2, 5, 6, 7, 8, 10} for x in range(15)]
+    group = PageGroup("1,2,5-8,10")
+    actual_group = [x in group for x in range(15)]
+    assert actual_group == test_group
+
+
 def test_iterates_over_pages():
     pages = [page for page in PageGroup("1,2,5-8,10")]
     assert pages == [1, 2, 5, 6, 7, 8, 10]
