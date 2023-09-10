@@ -1,6 +1,6 @@
 import pytest
 
-from pdf_parser.commands import PageGroup, InvalidGroupDefinition
+from pdf_parser.page_group import PageGroup, InvalidGroupDefinition
 
 
 @pytest.mark.parametrize(
